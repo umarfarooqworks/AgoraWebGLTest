@@ -20,8 +20,6 @@ public class AgoraVideoSetup : MonoBehaviour
 {
     public static AgoraVideoSetup instace;
 
-
-
     public enum ChannelActions
     {
         JOIN,
@@ -71,20 +69,7 @@ public class AgoraVideoSetup : MonoBehaviour
     bool videoStopped = true;
     private void Update()
     {
-        //if (AgoraController.instance.mRtcEngine.GetInitStatus() && Input.GetKeyDown(KeyCode.O))
-        //{
-        //    if(videoStopped)
-        //    {
-        //        videoStopped = false;
-        //        StartVideo();
-        //    }
-        //    else
-        //    {
-        //        videoStopped = true;
-        //        StopVideo();
-        //    }
-        //    SetUIButtons();
-        //}
+     
     }
 
 
@@ -98,7 +83,7 @@ public class AgoraVideoSetup : MonoBehaviour
     {
         StartVideoButton.GetComponent<Button>().onClick.RemoveListener(StartVideo);
         StopVideoButton.GetComponent<Button>().onClick.RemoveListener(StopVideo);
-//        AgoraController.instance.mRtcEngine.OnJoinChannelSuccess -= onJoinChannelSuccess;
+        AgoraController.instance.mRtcEngine.OnJoinChannelSuccess -= onJoinChannelSuccess;
     }
 
     public uint GetAgoraUserID() => AgoraController.instance.LocalUserID;
@@ -108,7 +93,7 @@ public class AgoraVideoSetup : MonoBehaviour
         AgoraController.instance.loadEngine(appid, yourToken);
         AgoraController.instance.mRtcEngine.RegisterLocalUserAccount(appid, _viewid);
         AgoraController.instance.join(channelName, true, _viewid);
-//        AgoraController.instance.mRtcEngine.OnJoinChannelSuccess += onJoinChannelSuccess;
+        AgoraController.instance.mRtcEngine.OnJoinChannelSuccess += onJoinChannelSuccess;
     }
 
     public void LeaveAgora()
@@ -146,25 +131,21 @@ public class AgoraVideoSetup : MonoBehaviour
 
     public void StartVideo()
     {
-        return;
         Debug.Log("StartVideo");
-        //        AgoraController.instance.mRtcEngine.MuteLocalVideoStream(false);
+//        AgoraController.instance.mRtcEngine.MuteLocalVideoStream(false);
         AgoraController.instance.EnableVideo(true);
         AgoraController.instance.mRtcEngine.EnableLocalVideo(true);
         //AgoraController.instance.DisplayLocalCameraOutputOnTopOfUser();
-        //        AgoraController.instance.EnableVideo(true);
         videoStopped = false;
         SetUIButtons();
     }
     public void StopVideo()
     {
-        return;
         Debug.Log("StopVideo");
-        //        AgoraController.instance.mRtcEngine.MuteLocalVideoStream(true);
+//        AgoraController.instance.mRtcEngine.MuteLocalVideoStream(true);
         AgoraController.instance.EnableVideo(false);
         AgoraController.instance.mRtcEngine.EnableLocalVideo(false);
-        AgoraController.instance.HideLocalCameraOutputOnTopOfUser();
-        //        AgoraController.instance.EnableVideo(false);
+//        AgoraController.instance.HideLocalCameraOutputOnTopOfUser();
         videoStopped = true;
         SetUIButtons();
     }

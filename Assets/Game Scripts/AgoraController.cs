@@ -6,6 +6,88 @@ using agora_utilities;
 using UnityEngine.UI;
 using TMPro;
 
+public class AgoraUserData
+{
+    public uint userID;
+    public bool VideoEnabled = false;
+    public bool AudioEnabled = false;
+    public VideoSurface videoSurface;
+
+    public AgoraUserData(uint userID, bool VideoEnabled, bool AudioEnabled)
+    {
+        this.userID = userID;
+        this.VideoEnabled = VideoEnabled;
+        this.AudioEnabled = AudioEnabled;
+    }
+
+    public void SetVideoSurface(VideoSurface videoSurface)
+    {
+        this.videoSurface = videoSurface;
+    }
+    public VideoSurface GetVideoSurface(VideoSurface videoSurface)
+    {
+        return this.videoSurface;
+    }
+}
+
+public class AgoraUserDataHandler
+{
+    List<AgoraUserData> agoraUserData = new List<AgoraUserData>();
+
+    public void AddNewUser(AgoraUserData userData)
+    {
+        agoraUserData.Add(userData);
+    }
+
+    public void AssignVideoSurface(uint userID, VideoSurface videoSurface)
+    {
+        foreach(AgoraUserData x in agoraUserData)
+        {
+            if(x.userID == userID)
+            {
+                x.SetVideoSurface(videoSurface);
+            }
+        }
+    }
+
+    public VideoSurface GetVideoSurface(uint userID)
+    {
+        foreach (AgoraUserData x in agoraUserData)
+        {
+            if (x.userID == userID)
+            {
+                return x.videoSurface;
+            }
+        }
+        return null;
+    }
+
+    public bool isVideoEnabled(uint userID)
+    {
+        foreach (AgoraUserData x in agoraUserData)
+        {
+            if (x.userID == userID)
+            {
+                return x.VideoEnabled;
+            }
+        }
+        return false;
+    }
+
+    public void SetVideoEnabled(uint userID, bool val)
+    {
+        foreach (AgoraUserData x in agoraUserData)
+        {
+            if (x.userID == userID)
+            {
+                x.VideoEnabled = val;
+            }
+        }
+    }
+}
+
+
+
 public class AgoraController : MonoBehaviour
 {
     public IRtcEngine mRtcEngine { get; set; }
@@ -29,6 +111,9 @@ public class AgoraController : MonoBehaviour
             return localUserID;
         }
     }
+
+    public AgoraUserDataHandler AgoraUserDataHandler = new AgoraUserDataHandler();
+
 
     private void Awake()
     {
@@ -133,8 +218,11 @@ public class AgoraController : MonoBehaviour
         Debug.Log("** onJoinChannelSuccess **");
 
         localUserID = uid;
+        AgoraUserDataHandler.AddNewUser(new AgoraUserData(uid, false, true));
         CreateNewVideoSurface(uid);
-        mRtcEngine.StartPreview();
+        mRtcEngine.StopPreview();
+
+        //mRtcEngine.StartPreview();
     }
     private void onUserJoined(uint uid, int elapsed)
     {
@@ -143,6 +231,7 @@ public class AgoraController : MonoBehaviour
         Debug.Log("onUserJoined: uid = " + uid + " elapsed = " + elapsed);
 
         CreateNewVideoSurface(uid);
+        AgoraUserDataHandler.AddNewUser(new AgoraUserData(uid, false, true));
     }
 
 
@@ -177,21 +266,30 @@ public class AgoraController : MonoBehaviour
         }
     }
 
+
+    bool localVideoStarted = true;
     public void EnableVideo(bool pauseVideo)
     {
         if (mRtcEngine != null)
         {
             if (!pauseVideo)
             {
-                Debug.Log("Stop Video");
-//                mRtcEngine.StartPreview();
+                Debug.Log("Local: Stop Video");
+
+                if(!localVideoStarted)
+                {
+                    localVideoStarted = true;
+                    mRtcEngine.StartPreview();
+                }
                 mRtcEngine.EnableVideo();
+                mRtcEngine.StartPreview();
             }
             else
             {
-                Debug.Log("Start Video");
+                Debug.Log("Local: Start Video");
 //                mRtcEngine.StopPreview();
                 mRtcEngine.DisableVideo();
+                mRtcEngine.StopPreview();
             }
         }
     }
@@ -334,17 +432,18 @@ public class AgoraController : MonoBehaviour
         GameObject childVideo = GetChildVideoLocation(uid);
         VideoSurface videoSurface = /*GetPlayerVideoSurfaceID((int)uid);//*/ MakeImageVideoSurface(childVideo, uid.ToString(), 200f, 200f);
 
-
         if (videoSurface != null)
         {
-            videoSurface.SetForUser(uid);
-            videoSurface.SetEnable(true);
-            videoSurface.SetVideoSurfaceType(AgoraVideoSurfaceType.RawImage);
-
-            //rawImageWithIDs.Add(new RawImageWithIDs((int)uid, videoSurface.gameObject.GetComponent<RawImage>()));
+            SetVideoSurfaceForUserID(uid, videoSurface);
+            AgoraUserDataHandler.AssignVideoSurface(uid, videoSurface);
         }
+    }
 
-
+    void SetVideoSurfaceForUserID(uint uid, VideoSurface videoSurface)
+    {
+        videoSurface.SetForUser(uid);
+        videoSurface.SetEnable(true);
+        videoSurface.SetVideoSurfaceType(AgoraVideoSurfaceType.RawImage);
     }
 
 
@@ -471,6 +570,33 @@ public class AgoraController : MonoBehaviour
 
     private void OnUserMutedVideo(uint uid, bool muted)
     {
+        Debug.Log("Client: " + uid + ", MutedVideo:" + muted);
+
+        if(muted == false)
+        {
+            Debug.Log("___1");
+            if(AgoraUserDataHandler.isVideoEnabled(uid) == false)
+            {
+                Debug.Log("___2");
+                if (AgoraUserDataHandler.GetVideoSurface(uid) == null)
+                {
+                    Debug.Log("___3");
+//                    CreateNewVideoSurface(uid);
+                    Debug.Log("___4");
+                    AgoraUserDataHandler.SetVideoEnabled(uid, true);
+                    Debug.Log("___5");
+                }
+            }
+        }
+
+        //Debug.Log("Looking for vs");
+        //VideoSurface vs = AgoraUserDataHandler.GetVideoSurface(uid);
+        //if(vs != null)
+        //{
+        //    Debug.Log("Found vs");
+        //    SetVideoSurfaceForUserID(uid, vs);
+        //    Debug.Log("vs Assigned");
+        //}
     }
 
 
