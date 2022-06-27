@@ -28,6 +28,10 @@ public class AgoraUserData
     {
         return this.videoSurface;
     }
+    public void VideoSurfaceSetEnable(bool b)
+    {
+        //videoSurface.SetEnable(b);
+    }
 }
 
 public class AgoraUserDataHandler
@@ -81,6 +85,17 @@ public class AgoraUserDataHandler
             if (x.userID == userID)
             {
                 x.VideoEnabled = val;
+            }
+        }
+    }
+
+    public void SetVideoSurfaceEnableDisable(uint userID, bool val)
+    {
+        foreach (AgoraUserData x in agoraUserData)
+        {
+            if (x.userID == userID)
+            {
+                x.VideoSurfaceSetEnable(val);
             }
         }
     }
@@ -218,9 +233,10 @@ public class AgoraController : MonoBehaviour
         Debug.Log("** onJoinChannelSuccess **");
 
         localUserID = uid;
-        AgoraUserDataHandler.AddNewUser(new AgoraUserData(uid, false, true));
         CreateNewVideoSurface(uid);
-        mRtcEngine.StopPreview();
+        AgoraUserDataHandler.AddNewUser(new AgoraUserData(uid, false, true));
+        AgoraUserDataHandler.SetVideoSurfaceEnableDisable(uid, false);
+        //        mRtcEngine.StopPreview();
 
         //mRtcEngine.StartPreview();
     }
@@ -266,8 +282,6 @@ public class AgoraController : MonoBehaviour
         }
     }
 
-
-    bool localVideoStarted = true;
     public void EnableVideo(bool pauseVideo)
     {
         if (mRtcEngine != null)
@@ -275,21 +289,13 @@ public class AgoraController : MonoBehaviour
             if (!pauseVideo)
             {
                 Debug.Log("Local: Stop Video");
-
-                if(!localVideoStarted)
-                {
-                    localVideoStarted = true;
-                    mRtcEngine.StartPreview();
-                }
                 mRtcEngine.EnableVideo();
-                mRtcEngine.StartPreview();
             }
             else
             {
                 Debug.Log("Local: Start Video");
 //                mRtcEngine.StopPreview();
                 mRtcEngine.DisableVideo();
-                mRtcEngine.StopPreview();
             }
         }
     }
@@ -571,34 +577,10 @@ public class AgoraController : MonoBehaviour
     private void OnUserMutedVideo(uint uid, bool muted)
     {
         Debug.Log("Client: " + uid + ", MutedVideo:" + muted);
-
-        if(muted == false)
-        {
-            Debug.Log("___1");
-            if(AgoraUserDataHandler.isVideoEnabled(uid) == false)
-            {
-                Debug.Log("___2");
-                if (AgoraUserDataHandler.GetVideoSurface(uid) == null)
-                {
-                    Debug.Log("___3");
-//                    CreateNewVideoSurface(uid);
-                    Debug.Log("___4");
-                    AgoraUserDataHandler.SetVideoEnabled(uid, true);
-                    Debug.Log("___5");
-                }
-            }
-        }
-
-        //Debug.Log("Looking for vs");
-        //VideoSurface vs = AgoraUserDataHandler.GetVideoSurface(uid);
-        //if(vs != null)
-        //{
-        //    Debug.Log("Found vs");
-        //    SetVideoSurfaceForUserID(uid, vs);
-        //    Debug.Log("vs Assigned");
-        //}
+        AgoraUserDataHandler.SetVideoSurfaceEnableDisable(uid, !muted);
     }
 
+    #region ZombieCode
 
     void OnVolumeIndicationHandler(AudioVolumeInfo[] speakers, int speakerNumber, int totalVolume)
     {
@@ -704,6 +686,7 @@ public class AgoraController : MonoBehaviour
         }
     }
 
+    #endregion ZombieCode
 
     #region Error Handling
     private int LastError { get; set; }

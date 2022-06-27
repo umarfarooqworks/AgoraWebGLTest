@@ -2549,6 +2549,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d612303502450c2478ea44f225660a2b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  view: {fileID: 3610008222613204004}
   Videos: {fileID: 111506628095033548}
   Raw_Image: {fileID: 1286876678123130582}
 --- !u!1 &6510547254283518302

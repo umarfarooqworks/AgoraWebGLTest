@@ -8,4 +8,7 @@ public static class PropertiesData
     public static string Gender = "G"; // G == 0 (female), G == 1 (male)
     public static int MaleCode = 1;
     public static int FeMaleCode = 0;
+
+
+    public static string VideoOnOff = "V"; //1 == On, 0 == off
 }
