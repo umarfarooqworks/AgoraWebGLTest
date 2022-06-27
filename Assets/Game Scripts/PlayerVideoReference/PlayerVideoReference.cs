@@ -13,6 +13,8 @@ public class PlayerVideoReference : MonoBehaviourPunCallbacks
     public Transform Videos;
     public RawImage Raw_Image;
 
+    public CanvasGroup canvasGroup;
+
     private void Start()
     {
         UpdateVideoOnOffView();
@@ -38,11 +40,11 @@ public class PlayerVideoReference : MonoBehaviourPunCallbacks
     {
         if (PhotonHelper.GetPlayerCustomProperty<int>(view, PropertiesData.VideoOnOff, 0) == 1)
         {
-            setVideoEnable(true);
+            canvasGroup.alpha = 1;
         }
         else
         {
-            setVideoEnable(false);
+            canvasGroup.alpha = 0;
         }
     }
 
@@ -50,8 +52,11 @@ public class PlayerVideoReference : MonoBehaviourPunCallbacks
     public override void OnPlayerPropertiesUpdate(Player targetPlayer, Hashtable changedProps)
     {
 
+        Debug.Log("OnPlayerPropertiesUpdate");
         if (changedProps.ContainsKey(PropertiesData.VideoOnOff))
         {
+            Debug.Log("targetPlayer == view.Owner =" + (targetPlayer == view.Owner));
+            Debug.Log("VideoOnOff: " + PhotonHelper.GetPlayerCustomProperty<int>(view, PropertiesData.VideoOnOff, 0));
             if (targetPlayer == view.Owner)
             {
                 UpdateVideoOnOffView();

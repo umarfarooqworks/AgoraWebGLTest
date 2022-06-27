@@ -132,20 +132,20 @@ public class AgoraVideoSetup : MonoBehaviour
     public void StartVideo()
     {
         Debug.Log("StartVideo");
-//        AgoraController.instance.mRtcEngine.MuteLocalVideoStream(false);
-        AgoraController.instance.EnableVideo(true);
-        AgoraController.instance.mRtcEngine.EnableLocalVideo(true);
-        //AgoraController.instance.DisplayLocalCameraOutputOnTopOfUser();
+        //AgoraController.instance.EnableVideo(true);
+        //AgoraController.instance.mRtcEngine.EnableLocalVideo(true);
+        PhotonHelper.SetPlayerCustomProperty(PhotonNetwork.LocalPlayer, PropertiesData.VideoOnOff, 1);
+        AgoraController.instance.DisplayLocalCameraOutputOnTopOfUser();
         videoStopped = false;
         SetUIButtons();
     }
     public void StopVideo()
     {
         Debug.Log("StopVideo");
-//        AgoraController.instance.mRtcEngine.MuteLocalVideoStream(true);
-        AgoraController.instance.EnableVideo(false);
-        AgoraController.instance.mRtcEngine.EnableLocalVideo(false);
-//        AgoraController.instance.HideLocalCameraOutputOnTopOfUser();
+        //AgoraController.instance.EnableVideo(false);
+        //AgoraController.instance.mRtcEngine.EnableLocalVideo(false);
+        PhotonHelper.SetPlayerCustomProperty(PhotonNetwork.LocalPlayer, PropertiesData.VideoOnOff, 0);
+        AgoraController.instance.HideLocalCameraOutputOnTopOfUser();
         videoStopped = true;
         SetUIButtons();
     }

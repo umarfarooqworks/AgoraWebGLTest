@@ -7831,7 +7831,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   appid: a8af82f44f4148ee8be8f41fe0dca332
   channelName: test
-  yourToken: 006a8af82f44f4148ee8be8f41fe0dca332IAAtXJJVPV3ZgiixDTx91TOekPLNgZ04bs1Ih7W0Ppyaawx+f9gAAAAAEACJVdSD7++4YgEAAQDv77hi
+  yourToken: 006a8af82f44f4148ee8be8f41fe0dca332IABZ2+BhiGnej9NT1C5HXVetYz0jD2rj8SMZOfmEnOsyXgx+f9gAAAAAEACJVdSDMIC6YgEAAQAvgLpi
   StartVideoButton: {fileID: 1368371384}
   StopVideoButton: {fileID: 1041903270}
 --- !u!1001 &1707340644

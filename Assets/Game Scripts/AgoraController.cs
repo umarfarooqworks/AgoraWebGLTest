@@ -225,7 +225,6 @@ public class AgoraController : MonoBehaviour
 
         mRtcEngine.JoinChannelByKey(channelKey: token, channelName: channel, info: "", uid: _useraccount);
         Debug.Log("**join - Ends**");
-
     }
 
     private void onJoinChannelSuccess(string channelName, uint uid, int elapsed)
@@ -237,7 +236,6 @@ public class AgoraController : MonoBehaviour
         AgoraUserDataHandler.AddNewUser(new AgoraUserData(uid, false, true));
         AgoraUserDataHandler.SetVideoSurfaceEnableDisable(uid, false);
         //        mRtcEngine.StopPreview();
-
         //mRtcEngine.StartPreview();
     }
     private void onUserJoined(uint uid, int elapsed)
@@ -353,11 +351,13 @@ public class AgoraController : MonoBehaviour
 
     GameObject GetChildVideoLocation(uint userUID)
     {
-        Debug.Log("**GetChildVideoLocation**");
-        GameObject go;
-//        return AgoraVideoSetup.instace.GetPlayerVideosChild(userUID.ToString());
-        go = GameObject.Find("Videoss");
-        return go;
+        //gets videos gameobject on top of player prefab
+        return AgoraVideoSetup.instace.GetPlayerVideosChild(userUID.ToString());
+
+        //gets videos gameobject from canvas
+        //GameObject go;
+        //go = GameObject.Find("Videoss");
+        //return go;
     }
 
     RawImage GetChildRawImage(uint userUID)
@@ -389,7 +389,6 @@ public class AgoraController : MonoBehaviour
         {
             Debug.Log("Video Surface found");
         }
-
         return vs;
     }
 
@@ -397,9 +396,48 @@ public class AgoraController : MonoBehaviour
 
     VideoSurface MakeImageVideoSurface(GameObject go, string userUID, float deltax = 250, float deltay = 250)
     {
-        //if (go.GetComponent<VideoSurface>())
-        //    return go.GetComponent<VideoSurface>();
+        return getVideoSurfaceFromGameCanvas2(go, userUID, deltax, deltay);
+        //return getVIdeoSurfaceFromPlayerTopCanvas(go, userUID);
+    }
 
+    VideoSurface getVIdeoSurfaceFromPlayerTopCanvas(GameObject go, string userUID)
+    {
+        GameObject newVideoobj = new GameObject($"{userUID}");
+        newVideoobj.transform.SetParent(go.transform);
+        newVideoobj.AddComponent<RawImage>();
+        newVideoobj.transform.localScale = new Vector3(1.0f, 1.0f, 1.0f);
+        var rectTransform = newVideoobj.GetComponent<RectTransform>();
+
+        rectTransform.sizeDelta = new Vector2(1f, 1f);
+        rectTransform.localPosition = new Vector3(rectTransform.localPosition.x, rectTransform.localPosition.y, 0);
+
+        rectTransform.localRotation = new Quaternion(0, rectTransform.localRotation.y, -180f,
+            rectTransform.localRotation.w);
+
+        Debug.Log("Make Video Successful for " + userUID);
+        return go.AddComponent<VideoSurface>();
+    }
+
+
+
+    VideoSurface getVideoSurfaceFromGameCanvas2(GameObject go, string userUID, float deltax = 250, float deltay = 250)
+    {
+        Debug.Log("**getVideoSurfaceFromGameCanvas2** - Start");
+        GameObject newVideoobj = new GameObject($"{userUID}");
+        newVideoobj.transform.SetParent(go.transform);
+        newVideoobj.AddComponent<RawImage>();
+        newVideoobj.transform.localScale = new Vector3(1.0f, 1.0f, 1.0f);
+        var rectTransform = newVideoobj.GetComponent<RectTransform>();
+
+        rectTransform.sizeDelta = new Vector2(deltax, deltay);
+        rectTransform.localPosition = Vector3.zero;
+
+        Debug.Log("**getVideoSurfaceFromGameCanvas2** - End");
+        return newVideoobj.AddComponent<VideoSurface>();
+    }
+
+    VideoSurface getVideoSurfaceFromGameCanvas(GameObject go, string userUID, float deltax = 250, float deltay = 250)
+    {
         GameObject newVideoobj = new GameObject($"{userUID}");
         newVideoobj.transform.SetParent(go.transform);
         newVideoobj.AddComponent<RawImage>();
@@ -429,6 +467,7 @@ public class AgoraController : MonoBehaviour
         return newVideoobj.AddComponent<VideoSurface>();
     }
 
+
     [SerializeField]
     private List<GameObject> remoteUserDisplays = new List<GameObject>();
 
@@ -436,7 +475,7 @@ public class AgoraController : MonoBehaviour
     {
         Debug.Log("**CreateNewVideoSurface**");
         GameObject childVideo = GetChildVideoLocation(uid);
-        VideoSurface videoSurface = /*GetPlayerVideoSurfaceID((int)uid);//*/ MakeImageVideoSurface(childVideo, uid.ToString(), 200f, 200f);
+        VideoSurface videoSurface = /*GetPlayerVideoSurfaceID((int)uid);//*/ MakeImageVideoSurface(childVideo, uid.ToString(), 1f, 1f);
 
         if (videoSurface != null)
         {

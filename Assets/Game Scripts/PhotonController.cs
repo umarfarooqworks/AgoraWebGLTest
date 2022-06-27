@@ -131,8 +131,9 @@ public class PhotonController : MonoBehaviourPunCallbacks
 
         AgoraVideoSetup.instace.StartAgora((uint) _viewid);
 
-//        OnClickMaleButton();
+        //        OnClickMaleButton();
         PhotonHelper.SetPlayerCustomProperty(PhotonNetwork.LocalPlayer, PropertiesData.Gender, SelectedGener);
+        PhotonHelper.SetPlayerCustomProperty(PhotonNetwork.LocalPlayer, PropertiesData.VideoOnOff, 0);
 
     }
 
